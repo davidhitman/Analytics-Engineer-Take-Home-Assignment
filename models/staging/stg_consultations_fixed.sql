@@ -20,7 +20,7 @@ cleaned as (
 
         -- Normalize timezone: convert all to UTC
         case
-            when consultation_started_at like '%+02:00'
+            when consultation_started_at like '%+2'
                 then toTimeZone(parseDateTimeBestEffort(consultation_started_at), 'UTC')
             else parseDateTimeBestEffort(consultation_started_at)
         end as started_at_utc,
@@ -30,7 +30,7 @@ cleaned as (
 
         -- Flag if correction applied
         case
-            when consultation_started_at like '%+02:00' then 1
+            when consultation_started_at like '%+2' then 1
             else 0
         end as is_tz_corrected
 
