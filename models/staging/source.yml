@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Raw source tables from the application database"
+    tables:
+      - name: consultations
+        description: "Raw consultation records including timestamps"
+        columns:
+          - name: consultation_id
+            description: "Primary key for consultations"
+          - name: patient_id
+            description: "Patient identifier"
+          - name: created_at
+            description: "Consultation request timestamp (UTC)"
+          - name: consultation_started_at
+            description: "Consultation start timestamp (mixed timezone formats)"
