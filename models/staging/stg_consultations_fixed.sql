@@ -22,7 +22,7 @@ parsed as (
         -- Convert consultation_started_at in a similar fashion
         parseDateTimeBestEffort(consultation_started_at) as started_raw,
 
-        -- Keep original raw timestamp (for pattern matching / validation)
+        -- Keep original raw timestamp 
         consultation_started_at
 
     from source_data
