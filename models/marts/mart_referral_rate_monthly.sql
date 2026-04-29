@@ -50,3 +50,18 @@ select
     patient_referrals / total_consults as patient_requested_rate
 
 from aggregated
+
+
+-- =========================
+-- Metric Definition Notes
+-- =========================
+-- Doctor-issued referral rate includes consultations where a doctor explicitly issued a referral.
+-- Cases classified as "both" are included in this metric because a clinical decision was made.
+--
+-- Patient-requested referral rate includes any consultation where the patient selected the referral
+-- request option, regardless of whether a doctor ultimately issued a referral. "Both" cases are also
+-- included here to reflect overlap between patient intent and clinician action.
+--
+-- Patient-requested referrals are not included in the primary clinical referral metric, as they do not
+-- represent confirmed clinical decisions. Including them would change the meaning of the metric and
+-- make it non-comparable to historical values that reflect clinician behavior only.
