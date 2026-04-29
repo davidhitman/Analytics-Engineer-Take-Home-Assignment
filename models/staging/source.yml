@@ -2,16 +2,16 @@ version: 2
 
 sources:
   - name: raw
-    description: "Raw source tables from the application database"
+    description: "Raw TeleClinic application tables"
     tables:
       - name: consultations
-        description: "Raw consultation records including timestamps"
+        description: "Consultation records with mixed timezone timestamps"
         columns:
           - name: consultation_id
-            description: "Primary key for consultations"
+            description: "Primary key"
           - name: patient_id
             description: "Patient identifier"
           - name: created_at
-            description: "Consultation request timestamp (UTC)"
+            description: "Consultation creation time (UTC)"
           - name: consultation_started_at
-            description: "Consultation start timestamp (mixed timezone formats)"
+            description: "Consultation start time (mixed timezone formats)"
