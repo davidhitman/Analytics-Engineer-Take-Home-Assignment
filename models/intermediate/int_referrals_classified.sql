@@ -1,15 +1,15 @@
 {{ config(materialized='view') }}
 
--- Create a CTE 'joined' to combine referral signals from consultations, outcomes, and requests
+-- Create 'joined' to combine referral signals from consultations, outcomes, and requests
 
 with joined as (
 
     select
         c.consultation_id,
 
-        -- Use 0 if 'referral_issued' is NULL (i.e., no doctor referral found)
+        -- Use 0 if 'referral_issued' is NULL
         ifNull(o.referral_issued, 0) as doctor_referral,
-        -- Use 0 if 'referral_requested' is NULL (i.e., no patient referral request found)
+        -- Use 0 if 'referral_requested' is NULL
         ifNull(i.referral_requested, 0) as patient_requested
 
     from {{ ref('stg_consultations_fixed') }} c
@@ -22,11 +22,11 @@ with joined as (
 
 )
     
--- Final selection: classify each consultation based on the referral signals
+-- classify each consultation based on the referral signals
 select
     consultation_id,
 
-    -- Assign a referral_type based on the presence/combination of each referral signal
+    -- Assign a referral_type based on the presence or combination of each referral signal
     case
         when doctor_referral = 1 and patient_requested = 1 then 'both'  -- Both doctor and patient triggered a referral on this consultation
         when doctor_referral = 1 then 'doctor_referral' -- Only the doctor triggered a referral
