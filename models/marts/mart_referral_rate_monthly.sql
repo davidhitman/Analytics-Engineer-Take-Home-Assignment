@@ -1,5 +1,7 @@
 {{ config(materialized='table') }}
 
+-- Extract consultation IDs and normalize timestamps to month start
+
 with base as (
 
     select
@@ -9,6 +11,7 @@ with base as (
 
 ),
 
+-- Pull the classified referral types for consultations
 classified as (
 
     select *
@@ -16,6 +19,7 @@ classified as (
 
 ),
 
+-- Join base consultations and their classified referral types
 joined as (
 
     select
@@ -24,18 +28,22 @@ joined as (
         c.referral_type
 
     from base b
+    -- Left join ensures all consultations are present, even if not classified
     left join classified c
         on b.consultation_id = c.consultation_id
 
 ),
 
+-- Aggregate referral counts for each month
 aggregated as (
 
     select
         month,
         count() as total_consults,
 
+        -- Count consultations with a clinical (doctor or both) referral
         countIf(referral_type in ('doctor_referral','both')) as doctor_referrals,
+        -- Count consultations with a patient-requested (or both) referral
         countIf(referral_type in ('patient_requested_only','both')) as patient_referrals
 
     from joined
@@ -43,6 +51,7 @@ aggregated as (
 
 )
 
+-- Compute referral rates as a share of total monthly consultations
 select
     month,
     total_consults,
