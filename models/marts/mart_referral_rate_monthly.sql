@@ -41,9 +41,9 @@ aggregated as (
         month,
         count() as total_consults,
 
-        -- Count consultations with a clinical (doctor or both) referral
+        -- Count consultations with a clinical referral
         countIf(referral_type in ('doctor_referral','both')) as doctor_referrals,
-        -- Count consultations with a patient-requested (or both) referral
+        -- Count consultations with a patient-requested referral
         countIf(referral_type in ('patient_requested_only','both')) as patient_referrals
 
     from joined
