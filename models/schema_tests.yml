@@ -2,21 +2,21 @@ version: 2
 
 models:
   - name: stg_consultations_fixed
-    description: "Cleaned consultations with timezone normalization"
+    description: "Cleaned consultations with timezone correction"
 
     columns:
       - name: consultation_id
         description: "Primary key — one row per consultation"
         tests:
-          - not_null
           - unique
+          - not_null
 
       - name: wait_time_minutes
         description: "Patient wait time in minutes; critical for operational reporting"
         tests:
           - dbt_utils.accepted_range:
               min_value: 0
-              max_value: 360
+              max_value: 360  #this is 360 minutes which is equivalent to 6 hours
 
       - name: is_tz_corrected
         description: "Flag indicating timezone correction was applied"
