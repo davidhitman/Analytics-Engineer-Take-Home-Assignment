@@ -18,34 +18,41 @@ models:
         description: "Patient wait time in minutes; critical for operational reporting"
         tests:
           - not_null   # Checks that there are no NULLs in 'wait_time_minutes'
+         # Accepted range test: Patient wait time should logically be between 0 and 6 hours (360 mins)
           - dbt_utils.accepted_range:
               min_value: 0
               max_value: 360  #this is 360 minutes which is equivalent to 6 hours, set as the maximum wait time
-
+      
+      # Boolean field, True if timezone correction logic was applied
       - name: is_tz_corrected
         description: "Flag indicating timezone correction was applied"
         tests:
           - not_null   # Checks that there are no NULLs in 'is_tz_corrected'
 
+  # Purpose of this test is to categorize each consultation’s referral type (doctor, patient, both, or none)
   - name: int_referrals_classified
     description: "Referral classification per consultation"
 
     columns:
+    # Each row linked to a consultation
       - name: consultation_id
         tests:
           - not_null
           - unique
 
+      # Referral category, used for reporting
       - name: referral_type
         description: "Referral category used in clinical reporting"
         tests:
           - accepted_values:
               values: ['doctor_referral', 'patient_requested_only', 'both', 'no_referral']
-
+  
+  # The purpose of this, is to Aggregated monthly reporting table for referral rates
   - name: mart_referral_rate_monthly
     description: "Monthly referral metrics for reporting"
 
     columns:
+    # Calendar month for the aggregated data
       - name: month
         tests:
           - not_null
