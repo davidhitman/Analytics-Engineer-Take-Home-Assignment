@@ -7,37 +7,39 @@ with source_data as (
 
 ),
 
-cleaned as (
+parsed as (
 
     select
         consultation_id,
         patient_id,
 
-        created_at,
-
-        -- Detect UTC+2 timestamps (string contains offset)
-        consultation_started_at,
-
-        -- Normalize timezone: convert all to UTC
-        case
-            when consultation_started_at like '%+2'
-                then toTimeZone(parseDateTimeBestEffort(consultation_started_at), 'UTC')
-            else parseDateTimeBestEffort(consultation_started_at)
-        end as started_at_utc,
-
-        -- created_at assumed already UTC
         parseDateTimeBestEffort(created_at) as created_at_utc,
+        parseDateTimeBestEffort(consultation_started_at) as started_raw,
 
-        -- Flag if correction applied
+        consultation_started_at
+
+    from source_data
+    where patient_id not like 'TEST_%'
+
+),
+
+normalized as (
+
+    select
+        consultation_id,
+        patient_id,
+        created_at_utc,
+
+        -- Normalize all timestamps to UTC
+        toTimeZone(started_raw, 'UTC') as started_at_utc,
+
+        -- Flag potential timezone mismatch cases
         case
-            when consultation_started_at like '%+2' then 1
+            when consultation_started_at like '%+2%' then 1
             else 0
         end as is_tz_corrected
 
-    from source_data
-
-    -- Remove test accounts
-    where patient_id not like 'TEST_%'
+    from parsed
 
 ),
 
@@ -50,18 +52,16 @@ final as (
         started_at_utc,
         is_tz_corrected,
 
-        -- Wait time in minutes
         dateDiff('minute', created_at_utc, started_at_utc) as raw_wait_time,
 
         -- Clean wait time
         case
-            -- Remove negative values or unrealistic values (> 6 hours = 360 mins)
             when dateDiff('minute', created_at_utc, started_at_utc) < 0 then null
-            when dateDiff('minute', created_at_utc, started_at_utc) > 360 then null
+            when dateDiff('minute', created_at_utc, started_at_utc) > 360 then null  -- If the wait time is above 6 hours
             else dateDiff('minute', created_at_utc, started_at_utc)
         end as wait_time_minutes
 
-    from cleaned
+    from normalized
 
 )
 
