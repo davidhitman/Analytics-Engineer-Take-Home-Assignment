@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: stg_consultations_fixed
+    description: "Cleaned consultations with timezone normalization"
+
+    columns:
+      - name: consultation_id
+        description: "Primary key — one row per consultation"
+        tests:
+          - not_null
+          - unique
+
+      - name: wait_time_minutes
+        description: "Patient wait time in minutes; critical for operational reporting"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 360
+
+      - name: is_tz_corrected
+        description: "Flag indicating timezone correction was applied"
+
+  - name: int_referrals_classified
+    description: "Referral classification per consultation"
+
+    columns:
+      - name: consultation_id
+        tests:
+          - not_null
+          - unique
+
+      - name: referral_type
+        description: "Referral category used in clinical reporting"
+        tests:
+          - accepted_values:
+              values: ['doctor_referral', 'patient_requested_only', 'both', 'no_referral']
+
+  - name: mart_referral_rate_monthly
+    description: "Monthly referral metrics for reporting"
+
+    columns:
+      - name: month
+        tests:
+          - not_null
+
+      - name: doctor_referral_rate
+        description: "Doctor-issued referral rate"
+
+      - name: patient_requested_rate
+        description: "Patient-requested referral rate"
