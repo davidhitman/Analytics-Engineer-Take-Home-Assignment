@@ -11,18 +11,21 @@ models:
       - name: consultation_id
         description: "Primary key — one row per consultation"
         tests:
-          - unique
-          - not_null
+          - unique # Ensures all values in 'id' are unique
+          - not_null # Checks that there are no NULLs in the 'id' column
 
       - name: wait_time_minutes
         description: "Patient wait time in minutes; critical for operational reporting"
         tests:
+          - not_null   # Checks that there are no NULLs in 'wait_time_minutes'
           - dbt_utils.accepted_range:
               min_value: 0
-              max_value: 360  #this is 360 minutes which is equivalent to 6 hours
+              max_value: 360  #this is 360 minutes which is equivalent to 6 hours, set as the maximum wait time
 
       - name: is_tz_corrected
         description: "Flag indicating timezone correction was applied"
+        tests:
+          - not_null   # Checks that there are no NULLs in 'is_tz_corrected'
 
   - name: int_referrals_classified
     description: "Referral classification per consultation"
