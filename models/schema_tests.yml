@@ -1,3 +1,6 @@
+# This file defines schema (data) tests for your DBT models.
+# It is used to enforce data quality and integrity checks.
+
 version: 2
 
 models:
